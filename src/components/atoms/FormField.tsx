@@ -105,7 +105,8 @@ export const FormField = (
                 <TextTrailingFade type={type} isVisible={isEditVisible} />
                 {getActionButton()}
             </FormInputContainer>
-            <TextInputSaveHint isVisible={!isEditVisible}>Press Enter to Save</TextInputSaveHint>
+            <CancelButton>Cancel</CancelButton>
+            <SaveButton>Save</SaveButton>
         </FormFieldContainer>
     )
 }
@@ -115,25 +116,15 @@ interface IFormFieldContainer {
 }
 
 const FormFieldContainer = styled.div<IFormFieldContainer>`
-  width: 155px;
-  height: ${({isVisible}) => isVisible ? '50px' : '30px'};
+  width: 200px;
+  height: ${({isVisible}) => isVisible ? '80px' : '30px'};
   border-radius: 5px;
   background-color: #282c34;
   transition: height ease-out 0.5s;
+  overflow: hidden;
+  text-align: right;
 `;
 
-interface ITextInputSaveHint {
-    isVisible: boolean
-}
-
-const TextInputSaveHint = styled.p<ITextInputSaveHint>`
-  padding: 0;
-  margin: 5px 0;
-  font-size: 10px;
-  font-style: italic;
-  opacity: ${({isVisible}) => isVisible ? 1 : 0};
-  transition: ${({isVisible}) => isVisible ? 'opacity ease-out 3s' : 'opacity ease-out 0.5s'};
-`;
 
 interface ITextTrailingFade {
     type: TField,
@@ -148,14 +139,15 @@ const TextTrailingFade = styled.div<ITextTrailingFade>`
   pointer-events: none;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
-  margin-left: ${({type}) => type === 'Edit' ? '-70px' : '-130px'};
+  position: absolute;
+  margin-right: ${({type}) => type === 'Edit' ? '-130px' : '-70px'};
   z-index: 98;
   transition: opacity ease-out 0.15s;
   opacity: ${({isVisible}) => isVisible ? 1 : 0};
 `;
 
 const FormInputContainer = styled.div`
-  width: 150px;
+  width: 200px;
   border-radius: 5px;
   height: 30px;
   flex-direction: row;
@@ -164,46 +156,54 @@ const FormInputContainer = styled.div`
   align-items: center;
 `;
 
+const _BaseButton = styled.button`
+  outline: none;
+  box-shadow: none;
+  height: 25px;
+  border-style: solid;
+  border-radius: 5px;
+  z-index: 99;
+  cursor: pointer;
+  border-color: rgb(169,181,244);
+  border-width: 2px;
+`;
+
+const SaveButton = styled(_BaseButton)`
+  width: 60px;
+  background-color: rgb(89,110,245);
+  margin: 0 10px;
+`;
+
+const CancelButton = styled(_BaseButton)`
+  width: 60px;
+  border-color: rgb(89,110,245);
+`;
+
 interface IEditButton {
     isEditVisible: boolean
 }
 
-const FormInputEditButton = styled.button<IEditButton>`
+const FormInputEditButton = styled(_BaseButton)<IEditButton>`
   background-color: white;
-  margin-left: -50px;
+  margin-right: -140px;
   width: 40px;
-  height: 25px;
-  border-style: solid;
-  border-radius: 5px;
-  border-color: rgb(169,181,244);
-  border-width: 2px;
   transition: opacity ease-out 0.15s;
-  outline: none;
-  box-shadow: none;
+  position: absolute;
   opacity: ${({isEditVisible}) => isEditVisible ? 1 : 0};
-  z-index: 99;
   display: ${({isEditVisible}) => isEditVisible ? 'block' : 'none'};
-  cursor: pointer;
 `;
 
 interface ICopyButton {
     isCopied: boolean
 }
 
-const FormInputCopyButton = styled.button<ICopyButton>`
-  outline: none;
-  box-shadow: none;
-  margin-left: -90px;
+const FormInputCopyButton = styled(_BaseButton)<ICopyButton>`
+  margin-right: -100px;
   width: 80px;
   height: 25px;
-  border-style: solid;
-  border-radius: 5px;
-  border-color: rgb(169,181,244);
-  border-width: 2px;
+  position: absolute;
   transition: background-color ease-in-out 0.2s;
   background-color: ${({isCopied}) => isCopied ? 'rgb(82, 220, 191)' : 'white'};
-  z-index: 99;
-  cursor: pointer;
 `;
 
 const FormInputText = styled.input`
@@ -211,7 +211,7 @@ const FormInputText = styled.input`
   border: 0;
   border-radius: 5px;
   padding: 5px;
-  width: 150px;
+  width: 190px;
   height: 20px;
   &:focus {
     box-shadow: none;
