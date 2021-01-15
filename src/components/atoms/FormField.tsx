@@ -25,13 +25,11 @@ export const FormField = (
     const [isEditVisible, setIsEditVisible] = useState(true);
     const [copyButtonText, setCopyButtonText] = useState<CopyButtonText>(CopyButtonText.COPY);
     const formInputFieldRef = useRef<HTMLInputElement>(null);
-
-    const onInputFieldBlur = () => {
-        setIsDisabled(true);
-        setIsEditVisible(true);
-    }
+    const [formValue, setFormValue] = useState('');
+    const previousFormValueRef = useRef(formValue);
 
     const onEditButtonPress = () => {
+        previousFormValueRef.current = formValue;
         setIsDisabled(false);
         setIsEditVisible(false);
     }
@@ -81,46 +79,79 @@ export const FormField = (
         }
     }, [type, isEditVisible, copyButtonText]);
 
+    const onBlurTextInput = () => {
+        setIsDisabled(true);
+        setIsEditVisible(true);
+    }
+
     const onEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         switch (event.key) {
             case 'Enter':
                 formInputFieldRef.current?.blur();
+                onBlurTextInput();
                 break;
             case 'Escape':
                 formInputFieldRef.current?.blur();
+                onBlurTextInput();
                 break;
         }
     }
 
+    const onChangeText = (textValue: string) => {
+        setFormValue(textValue)
+    }
+
+    const onCancelPress = () => {
+        console.log("Butotn clicked")
+        console.log(formValue, previousFormValueRef.current, "iiii")
+        setFormValue(previousFormValueRef.current);
+        onBlurTextInput();
+    }
+
+    const onSavePress = () => {
+        onBlurTextInput();
+    }
+
     return (
-        <FormFieldContainer isVisible={!isEditVisible}>
+        <FormFieldContainer>
             <FormInputContainer {...props}>
                 <FormInputText
                     onKeyDown={(event) => onEnterKeyDown(event)}
                     ref={formInputFieldRef}
                     disabled={isDisabled}
-                    onBlur={onInputFieldBlur}
+                    onChange={({target}) => onChangeText(target.value)}
+                    value={formValue}
                     {...formInputTextProps}
                 />
                 <TextTrailingFade type={type} isVisible={isEditVisible} />
                 {getActionButton()}
             </FormInputContainer>
-            <CancelButton>Cancel</CancelButton>
-            <SaveButton>Save</SaveButton>
+            <EditingButtonsContainer isVisible={!isEditVisible}>
+                <CancelButton onClick={onCancelPress}>Cancel</CancelButton>
+                <SaveButton onClick={onSavePress}>Save</SaveButton>
+            </EditingButtonsContainer>
         </FormFieldContainer>
     )
 }
 
-interface IFormFieldContainer {
+const FormFieldContainer = styled.div`
+  height: 80px;
+  width: 200px;
+`;
+
+interface IEditingButtonsContainer {
     isVisible: boolean
 }
 
-const FormFieldContainer = styled.div<IFormFieldContainer>`
+const EditingButtonsContainer = styled.div<IEditingButtonsContainer>`
   width: 200px;
-  height: ${({isVisible}) => isVisible ? '80px' : '30px'};
+  opacity: ${({isVisible}) => isVisible ? 1 : 0};
+  margin-top: -25px;
+  padding-top: ${({isVisible}) => isVisible ? '20px' : '0px'};
+  height: 40px;
+  position: absolute;
+  transition: opacity ease-out 0.15s, padding-top ease-out 0.15s;
   border-radius: 5px;
-  background-color: #282c34;
-  transition: height ease-out 0.5s;
   overflow: hidden;
   text-align: right;
 `;
@@ -154,6 +185,7 @@ const FormInputContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 98;
 `;
 
 const _BaseButton = styled.button`
@@ -170,12 +202,16 @@ const _BaseButton = styled.button`
 
 const SaveButton = styled(_BaseButton)`
   width: 60px;
+  border: 0;
+  color: white;
   background-color: rgb(89,110,245);
   margin: 0 10px;
 `;
 
 const CancelButton = styled(_BaseButton)`
   width: 60px;
+  background-color: transparent;
+  color: rgb(94, 107, 150);
   border-color: rgb(89,110,245);
 `;
 
@@ -207,17 +243,22 @@ const FormInputCopyButton = styled(_BaseButton)<ICopyButton>`
 `;
 
 const FormInputText = styled.input`
-  background-color: rgb(224,230,244);
-  border: 0;
+  background-color: #fff;
   border-radius: 5px;
+  box-shadow: none;
+  outline: none;
   padding: 5px;
   width: 190px;
   height: 20px;
+  color: grey;
+  border: 1px solid #dfe6f5;
   &:focus {
-    box-shadow: none;
-    outline: none;
+    color: black;
     background-color: white;
+    border-width: 1px;
+    border-color: rgb(89,110,245);
   }
-  transition: background-color ease-out 0.15s;
+  transition: background-color ease-out 0.15s, color ease-out 0.15s, border-color ease-out 0.15s;
   overflow: scroll;
+  z-index: 97;
 `;

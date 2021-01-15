@@ -29,9 +29,9 @@ const settingsInfo: IFormField[] = [{
 function App() {
 
     const getFormFields = (formData: IFormField[]): JSX.Element[] => {
-        return formData.map(({title, description, formComponent}) => {
+        return formData.map(({title, description, formComponent}, index) => {
             return (
-                <FormSection>
+                <FormSection key={title + index.toString()}>
                     <LeftFormFieldSection>
                         <h3>{title}</h3>
                         <p>{description}</p>
@@ -57,13 +57,14 @@ const FormSection = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
-  background-color: #61dafb;
+  background-color: white;
   align-items: center;
   justify-content: space-between;
 `;
 
 const LeftFormFieldSection = styled.div`
   flex: 0.5 0;
+  color: black;
   text-align: left;
 `;
 
